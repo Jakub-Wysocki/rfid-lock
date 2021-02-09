@@ -12,6 +12,8 @@
   "files.associations": {
     "*.ipp": "c",
     "sys.h": "c",
-    "err.h": "c"
+    "err.h": "c",
+    "*.inc": "c",
+    "complex": "c"
   }
 }

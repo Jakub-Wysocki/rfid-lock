@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
 #include "freertos/task.h"
@@ -8,26 +9,24 @@
 #include "esp_spi_flash.h"
 #include "esp_event.h"
 
+#include "sdkconfig.h"
 #include "esp_log.h"
+#include <esp_log_internal.h>
 #include "nvs_flash.h"
 
 #include "lwip/err.h"
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
 #include "lwip/netdb.h"
-#include "lwip/dns.h" 
+#include "lwip/dns.h"
 
-/* The examples use WiFi configuration that you can set via project configuration menu
+#include "pn532.h"
 
-   If you'd rather not, just change the below entries to strings with
-   the config you want - ie #define EXAMPLE_WIFI_SSID "mywifissid"
-*/
 #define EXAMPLE_ESP_WIFI_SSID "WM_R" // "toya525459176" //  //"S64" //
 #define EXAMPLE_ESP_WIFI_PASS "SW_F24pr2018R$" //  //"17986884" // "uptcawej9jgwe"
 #define EXAMPLE_ESP_MAXIMUM_RETRY 1
 
-/* This is the config of the TCP Client
-*/
+/* This is the config of the TCP Client */
 #define MESSAGE "HelloTCPServer"
 #define TCPServerIP "210.10.10.57"
 
@@ -39,11 +38,18 @@ static EventGroupHandle_t s_wifi_event_group;
  * - we failed to connect after the maximum amount of retries */
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT      BIT1
+/* SPI CONFIG
+*/
+#define PN532_SCK 19
+#define PN532_MOSI 23
+#define PN532_SS 22
+#define PN532_MISO 25
 
-static const char *TAG = "wifi station";
+static const char *TAG = "WiFi station";
 
 static int s_retry_num = 0;
-
+static const char *TAG_RFID = "RFID";
+static pn532_t nfc;
 
 static void event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
@@ -65,7 +71,6 @@ static void event_handler(void* arg, esp_event_base_t event_base, int32_t event_
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
     }
 }
-
 
 void wifi_init_sta(void)
 {
@@ -178,6 +183,57 @@ void tcp_client(void *pvParam){
     ESP_LOGI(TAG, "...tcp_client task closed\n");
 }
 
+void nfc_task(void *pvParameter)
+{
+    pn532_spi_init(&nfc, PN532_SCK, PN532_MISO, PN532_MOSI, PN532_SS);
+    pn532_begin(&nfc);
+
+    uint32_t versiondata = pn532_getFirmwareVersion(&nfc);
+    if (!versiondata)
+    {
+        ESP_LOGI(TAG_RFID, "Didn't find PN53x board");
+        while (1)
+        {
+            vTaskDelay(1000 / portTICK_RATE_MS);
+        }
+    }
+    // Got ok data, print it out!
+    ESP_LOGI(TAG_RFID, "Found chip PN5 %x", (versiondata >> 24) & 0xFF);
+    ESP_LOGI(TAG_RFID, "Firmware ver. %d.%d", (versiondata >> 16) & 0xFF, (versiondata >> 8) & 0xFF);
+
+    // configure board to read RFID tags
+    pn532_SAMConfig(&nfc);
+
+    ESP_LOGI(TAG_RFID, "Waiting for an ISO14443A Card ...");
+
+    while (1)
+    {
+        uint8_t success;
+        uint8_t uid[] = {0, 0, 0, 0, 0, 0, 0}; // Buffer to store the returned UID
+        uint8_t uidLength;                     // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
+
+        // Wait for an ISO14443A type cards (Mifare, etc.).  When one is found
+        // 'uid' will be populated with the UID, and uidLength will indicate
+        // if the uid is 4 bytes (Mifare Classic) or 7 bytes (Mifare Ultralight)
+        success = pn532_readPassiveTargetID(&nfc, PN532_MIFARE_ISO14443A, uid, &uidLength, 0);
+
+        if (success)
+        {
+            // Display some basic information about the card
+            ESP_LOGI(TAG_RFID, "Found an ISO14443A card");
+            ESP_LOGI(TAG_RFID, "UID Length: %d bytes", uidLength);
+            ESP_LOGI(TAG_RFID, "UID Value:");
+            esp_log_buffer_hexdump_internal(TAG_RFID, uid, uidLength, ESP_LOG_INFO);   
+            vTaskDelay(1000 / portTICK_RATE_MS);         
+        }
+        else
+        {
+            // PN532 probably timed out waiting for a card
+            ESP_LOGI(TAG_RFID, "Timed out waiting for a card");
+        }
+    }
+}
+
 void app_main(void)
 {
     printf("Hello world!\n");
@@ -194,5 +250,6 @@ void app_main(void)
     wifi_init_sta();
 
     xTaskCreate(&tcp_client,"tcp_client",4048,NULL,5,NULL);
+    xTaskCreate(&nfc_task, "nfc_task", 4096, NULL, 4, NULL);
 
 }
