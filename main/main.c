@@ -27,7 +27,7 @@
 #define EXAMPLE_ESP_MAXIMUM_RETRY 1
 
 /* This is the config of the TCP Client */
-#define MESSAGE "HelloTCPServer"
+#define MESSAGE "1"
 #define TCPServerIP "210.10.10.57"
 
 /* FreeRTOS event group to signal when we are connected*/
@@ -45,7 +45,7 @@ static EventGroupHandle_t s_wifi_event_group;
 #define PN532_SS 22
 #define PN532_MISO 25
 
-static const char *TAG = "WiFi station";
+static const char *TAG_WIFI = "WiFi";
 
 static int s_retry_num = 0;
 static const char *TAG_RFID = "RFID";
@@ -59,14 +59,14 @@ static void event_handler(void* arg, esp_event_base_t event_base, int32_t event_
         if (s_retry_num < EXAMPLE_ESP_MAXIMUM_RETRY) {
             esp_wifi_connect();
             s_retry_num++;
-            ESP_LOGI(TAG, "retry to connect to the AP");
+            ESP_LOGI(TAG_WIFI, "retry to connect to the AP");
         } else {
             xEventGroupSetBits(s_wifi_event_group, WIFI_FAIL_BIT);
         }
-        ESP_LOGI(TAG,"connect to the AP fail");
+        ESP_LOGI(TAG_WIFI,"connect to the AP fail");
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
-        ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
+        ESP_LOGI(TAG_WIFI, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
     }
@@ -108,7 +108,7 @@ void wifi_init_sta(void)
     ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config) );
     ESP_ERROR_CHECK(esp_wifi_start() );
     
-    ESP_LOGI(TAG, "wifi_init_sta finished.");
+    ESP_LOGI(TAG_WIFI, "wifi_init_sta finished.");
 
     /* Waiting until either the connection is established (WIFI_CONNECTED_BIT) or connection failed for the maximum
      * number of re-tries (WIFI_FAIL_BIT). The bits are set by event_handler() (see above) */
@@ -121,13 +121,13 @@ void wifi_init_sta(void)
     /* xEventGroupWaitBits() returns the bits before the call returned, hence we can test which event actually
      * happened. */
     if (bits & WIFI_CONNECTED_BIT) {
-        ESP_LOGI(TAG, "connected to ap SSID:%s password:%s",
+        ESP_LOGI(TAG_WIFI, "connected to ap SSID:%s password:%s",
                  EXAMPLE_ESP_WIFI_SSID, EXAMPLE_ESP_WIFI_PASS);
     } else if (bits & WIFI_FAIL_BIT) {
-        ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s",
+        ESP_LOGI(TAG_WIFI, "Failed to connect to SSID:%s, password:%s",
                  EXAMPLE_ESP_WIFI_SSID, EXAMPLE_ESP_WIFI_PASS);
     } else {
-        ESP_LOGE(TAG, "UNEXPECTED EVENT");
+        ESP_LOGE(TAG_WIFI, "UNEXPECTED EVENT");
     }
 
     ESP_ERROR_CHECK(esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler));
@@ -135,38 +135,38 @@ void wifi_init_sta(void)
     vEventGroupDelete(s_wifi_event_group);
 }
 
-void tcp_client(void *pvParam){
-    ESP_LOGI(TAG,"tcp_client task started \n");
+void tcp_client(){
+    ESP_LOGI(TAG_WIFI,"tcp_client task started \n");
     struct sockaddr_in tcpServerAddr;
     tcpServerAddr.sin_addr.s_addr = inet_addr(TCPServerIP);
     tcpServerAddr.sin_family = AF_INET;
     tcpServerAddr.sin_port = htons( 50000 );
-    int s; /*, r;
+    int s, r;
     char recv_buf[64]; // for reading purposes only */
     while(1){
-        //xEventGroupWaitBits(s_wifi_event_group, WIFI_CONNECTED_BIT ,false,true,portMAX_DELAY); //co tu nie działa?
+        
         s = socket(AF_INET, SOCK_STREAM, 0);
         if(s < 0) {
-            ESP_LOGE(TAG, "... Failed to allocate socket.\n");
+            ESP_LOGE(TAG_WIFI, "... Failed to allocate socket.\n");
             vTaskDelay(1000 / portTICK_PERIOD_MS);
             continue;
         }
-        ESP_LOGI(TAG, "... allocated socket\n");
+        ESP_LOGI(TAG_WIFI, "... allocated socket\n");
          if(connect(s, (struct sockaddr *)&tcpServerAddr, sizeof(tcpServerAddr)) != 0) {
-            ESP_LOGE(TAG, "... socket connect failed errno=%d \n", errno);
+            ESP_LOGE(TAG_WIFI, "... socket connect failed errno=%d \n", errno);
             close(s);
             vTaskDelay(4000 / portTICK_PERIOD_MS);
             continue;
         }
-        ESP_LOGI(TAG, "... connected \n");
+        ESP_LOGI(TAG_WIFI, "... connected \n");
         if( write(s , MESSAGE , strlen(MESSAGE)) < 0)
         {
-            ESP_LOGE(TAG, "... Send failed \n");
+            ESP_LOGE(TAG_WIFI, "... Send failed \n");
             close(s);
             vTaskDelay(4000 / portTICK_PERIOD_MS);
             continue;
         }
-        ESP_LOGI(TAG, "... socket send success"); /* 
+        ESP_LOGI(TAG_WIFI, "... socket send success");
         do {
             bzero(recv_buf, sizeof(recv_buf));
             r = read(s, recv_buf, sizeof(recv_buf)-1);
@@ -174,13 +174,13 @@ void tcp_client(void *pvParam){
                 putchar(recv_buf[i]);
             }
         } while(r > 0);
-        ESP_LOGI(TAG, "... done reading from socket. Last read return=%d errno=%d\r\n", r, errno); */
+        ESP_LOGI(TAG_WIFI, "... done reading from socket. Last read return=%d errno=%d\r\n", r, errno);
+        ESP_LOGI(TAG_WIFI, "... Result: %s\n", recv_buf);
         close(s);
-        ESP_LOGI(TAG, "... new request in 5 seconds");
-        vTaskDelay(5000 / portTICK_PERIOD_MS);
+        break;
     
     }
-    ESP_LOGI(TAG, "...tcp_client task closed\n");
+    ESP_LOGI(TAG_WIFI, "...tcp_client task closed\n");
 }
 
 void nfc_task(void *pvParameter)
@@ -224,7 +224,10 @@ void nfc_task(void *pvParameter)
             ESP_LOGI(TAG_RFID, "UID Length: %d bytes", uidLength);
             ESP_LOGI(TAG_RFID, "UID Value:");
             esp_log_buffer_hexdump_internal(TAG_RFID, uid, uidLength, ESP_LOG_INFO);   
-            vTaskDelay(1000 / portTICK_RATE_MS);         
+            vTaskDelay(1000 / portTICK_RATE_MS);
+
+            tcp_client();
+              
         }
         else
         {
@@ -234,10 +237,24 @@ void nfc_task(void *pvParameter)
     }
 }
 
+int access_control(char *data)
+{
+    tcp_client(data);
+
+    /*if(access == true)
+
+        //open lock
+        //light green diode
+    else
+        //light red diode*/
+        
+    return 0;
+}
+
+
 void app_main(void)
 {
-    printf("Hello world!\n");
-
+    
     //Initialize NVS
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
@@ -246,10 +263,10 @@ void app_main(void)
     }
     ESP_ERROR_CHECK(ret);
 
-    ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
+    ESP_LOGI(TAG_WIFI, "ESP_WIFI_MODE_STA");
     wifi_init_sta();
 
-    xTaskCreate(&tcp_client,"tcp_client",4048,NULL,5,NULL);
+    //xTaskCreate(&tcp_client,"tcp_client",4048,NULL,5,NULL);
     xTaskCreate(&nfc_task, "nfc_task", 4096, NULL, 4, NULL);
 
 }

@@ -14,6 +14,8 @@
     "sys.h": "c",
     "err.h": "c",
     "*.inc": "c",
-    "complex": "c"
+    "complex": "c",
+    "*.tcc": "c",
+    "fstream": "c"
   }
 }
