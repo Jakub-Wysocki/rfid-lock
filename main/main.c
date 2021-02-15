@@ -135,7 +135,7 @@ void wifi_init_sta(void)
     vEventGroupDelete(s_wifi_event_group);
 }
 
-void tcp_client(){
+void tcp_client(char* data){
     ESP_LOGI(TAG_WIFI,"tcp_client task started \n");
     struct sockaddr_in tcpServerAddr;
     tcpServerAddr.sin_addr.s_addr = inet_addr(TCPServerIP);
@@ -159,20 +159,21 @@ void tcp_client(){
             continue;
         }
         ESP_LOGI(TAG_WIFI, "... connected \n");
-        if( write(s , MESSAGE , strlen(MESSAGE)) < 0)
+        if( write(s , data , strlen(data)) < 0)
         {
             ESP_LOGE(TAG_WIFI, "... Send failed \n");
             close(s);
             vTaskDelay(4000 / portTICK_PERIOD_MS);
             continue;
         }
-        ESP_LOGI(TAG_WIFI, "... socket send success");
+        ESP_LOGI(TAG_WIFI, "... socket send success\n");
         do {
             bzero(recv_buf, sizeof(recv_buf));
             r = read(s, recv_buf, sizeof(recv_buf)-1);
             for(int i = 0; i < r; i++) {
                 putchar(recv_buf[i]);
             }
+            printf("\n");
         } while(r > 0);
         ESP_LOGI(TAG_WIFI, "... done reading from socket. Last read return=%d errno=%d\r\n", r, errno);
         ESP_LOGI(TAG_WIFI, "... Result: %s\n", recv_buf);
@@ -226,7 +227,12 @@ void nfc_task(void *pvParameter)
             esp_log_buffer_hexdump_internal(TAG_RFID, uid, uidLength, ESP_LOG_INFO);   
             vTaskDelay(1000 / portTICK_RATE_MS);
 
-            tcp_client();
+            char str_uid[128];
+            int index = 0;
+            for (int i=0; i < 5; i++)
+                index += sprintf(&str_uid[index], "%d", uid[i]);
+
+            tcp_client(str_uid);
               
         }
         else
