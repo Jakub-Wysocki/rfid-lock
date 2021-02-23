@@ -8,6 +8,7 @@
 #include "esp_wifi.h"
 #include "esp_spi_flash.h"
 #include "esp_event.h"
+#include "driver/gpio.h"
 
 #include "sdkconfig.h"
 #include "esp_log.h"
@@ -44,6 +45,10 @@ static EventGroupHandle_t s_wifi_event_group;
 #define PN532_MOSI 23
 #define PN532_SS 22
 #define PN532_MISO 25
+
+#define GPIO_BUZZER 27
+//#define GPIO_GREEN_LED 26 //TODO
+#define GPIO_RED_LED 14
 
 static const char *TAG_WIFI = "WiFi";
 
@@ -135,6 +140,30 @@ void wifi_init_sta(void)
     vEventGroupDelete(s_wifi_event_group);
 }
 
+void beep(int result)
+{
+
+    if(!result)
+    {   
+        gpio_pad_select_gpio(GPIO_BUZZER);
+        gpio_set_direction(GPIO_BUZZER, GPIO_MODE_OUTPUT);
+        gpio_set_level(GPIO_BUZZER, 1);
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
+        gpio_set_level(GPIO_BUZZER, 0);
+    }
+    else
+    {
+        printf("I'm here 2");
+        gpio_pad_select_gpio(GPIO_RED_LED);
+        gpio_set_direction(GPIO_RED_LED, GPIO_MODE_OUTPUT);
+        gpio_set_level(GPIO_RED_LED, 1);
+        vTaskDelay(3000 / portTICK_PERIOD_MS);
+        gpio_set_level(GPIO_RED_LED, 0);
+
+    }
+
+}
+
 void tcp_client(char* data){
     ESP_LOGI(TAG_WIFI,"tcp_client task started \n");
     struct sockaddr_in tcpServerAddr;
@@ -142,7 +171,7 @@ void tcp_client(char* data){
     tcpServerAddr.sin_family = AF_INET;
     tcpServerAddr.sin_port = htons( 50000 );
     int s, r;
-    char recv_buf[64]; // for reading purposes only */
+    char recv_buf[64], result[64]; // for reading purposes only */
     while(1){
         
         s = socket(AF_INET, SOCK_STREAM, 0);
@@ -172,17 +201,45 @@ void tcp_client(char* data){
             r = read(s, recv_buf, sizeof(recv_buf)-1);
             for(int i = 0; i < r; i++) {
                 putchar(recv_buf[i]);
+                
+                result[i] = recv_buf[i];
             }
             printf("\n");
+
+
         } while(r > 0);
         ESP_LOGI(TAG_WIFI, "... done reading from socket. Last read return=%d errno=%d\r\n", r, errno);
-        ESP_LOGI(TAG_WIFI, "... Result: %s\n", recv_buf);
+        ESP_LOGI(TAG_WIFI, "... Result: %s\n", result);
         close(s);
         break;
     
     }
+
+    beep(strncmp(result, "Access granted", 8));
     ESP_LOGI(TAG_WIFI, "...tcp_client task closed\n");
 }
+
+
+/*
+void grant_access(char *data)
+{
+    if(data == NULL)
+        return 0;
+
+    char str_uid[128];
+    int index = 0;
+    for (int i=0; i < 5; i++)
+                index += sprintf(&str_uid[index], "%d", uid[i]);
+
+    tcp_client(data);
+
+    if(strncmp(data, "Access granted", 8) == 0)
+        //light green diode
+    else
+        //light red diode
+        
+}*/// to do 
+
 
 void nfc_task(void *pvParameter)
 {
@@ -243,20 +300,6 @@ void nfc_task(void *pvParameter)
     }
 }
 
-int access_control(char *data)
-{
-    tcp_client(data);
-
-    /*if(access == true)
-
-        //open lock
-        //light green diode
-    else
-        //light red diode*/
-        
-    return 0;
-}
-
 
 void app_main(void)
 {
@@ -272,7 +315,6 @@ void app_main(void)
     ESP_LOGI(TAG_WIFI, "ESP_WIFI_MODE_STA");
     wifi_init_sta();
 
-    //xTaskCreate(&tcp_client,"tcp_client",4048,NULL,5,NULL);
     xTaskCreate(&nfc_task, "nfc_task", 4096, NULL, 4, NULL);
 
 }

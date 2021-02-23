@@ -16,6 +16,8 @@
     "*.inc": "c",
     "complex": "c",
     "*.tcc": "c",
-    "fstream": "c"
+    "fstream": "c",
+    "stdio.h": "c",
+    "functional": "c"
   }
 }
