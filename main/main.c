@@ -23,8 +23,8 @@
 
 #include "pn532.h"
 
-#define EXAMPLE_ESP_WIFI_SSID "WM_R" // "toya525459176" //  //"S64" //
-#define EXAMPLE_ESP_WIFI_PASS "SW_F24pr2018R$" //  //"17986884" // "uptcawej9jgwe"
+#define EXAMPLE_ESP_WIFI_SSID
+#define EXAMPLE_ESP_WIFI_PASS 
 #define EXAMPLE_ESP_MAXIMUM_RETRY 1
 
 /* This is the config of the TCP Client */
