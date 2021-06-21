@@ -25,13 +25,13 @@
 
 /*----------------------*/
 
-#define EXAMPLE_ESP_WIFI_SSID 
-#define EXAMPLE_ESP_WIFI_PASS 
+#define EXAMPLE_ESP_WIFI_SSID ""
+#define EXAMPLE_ESP_WIFI_PASS "" 
 #define EXAMPLE_ESP_MAXIMUM_RETRY 1
 
 /* This is the config of the TCP Client */
 #define MESSAGE "1"
-#define TCPServerIP 
+#define TCPServerIP ""
 
 /* FreeRTOS event group to signal when we are connected*/
 static EventGroupHandle_t s_wifi_event_group;
