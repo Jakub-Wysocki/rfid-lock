@@ -23,13 +23,15 @@
 
 #include "pn532.h"
 
-#define EXAMPLE_ESP_WIFI_SSID
-#define EXAMPLE_ESP_WIFI_PASS 
+/*----------------------*/
+
+#define EXAMPLE_ESP_WIFI_SSID ""
+#define EXAMPLE_ESP_WIFI_PASS "" 
 #define EXAMPLE_ESP_MAXIMUM_RETRY 1
 
 /* This is the config of the TCP Client */
 #define MESSAGE "1"
-#define TCPServerIP "210.10.10.57"
+#define TCPServerIP ""
 
 /* FreeRTOS event group to signal when we are connected*/
 static EventGroupHandle_t s_wifi_event_group;
@@ -39,19 +41,18 @@ static EventGroupHandle_t s_wifi_event_group;
  * - we failed to connect after the maximum amount of retries */
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT      BIT1
-/* SPI CONFIG
-*/
+
+/* SPI CONFIG*/
 #define PN532_SCK 19
 #define PN532_MOSI 23
 #define PN532_SS 22
 #define PN532_MISO 25
 
+/* GPIO PINS*/
 #define GPIO_BUZZER 27
-//#define GPIO_GREEN_LED 26 //TODO
 #define GPIO_RED_LED 14
 
 static const char *TAG_WIFI = "WiFi";
-
 static int s_retry_num = 0;
 static const char *TAG_RFID = "RFID";
 static pn532_t nfc;
@@ -153,7 +154,7 @@ void beep(int result)
     }
     else
     {
-        printf("I'm here 2");
+
         gpio_pad_select_gpio(GPIO_RED_LED);
         gpio_set_direction(GPIO_RED_LED, GPIO_MODE_OUTPUT);
         gpio_set_level(GPIO_RED_LED, 1);
@@ -218,28 +219,6 @@ void tcp_client(char* data){
     beep(strncmp(result, "Access granted", 8));
     ESP_LOGI(TAG_WIFI, "...tcp_client task closed\n");
 }
-
-
-/*
-void grant_access(char *data)
-{
-    if(data == NULL)
-        return 0;
-
-    char str_uid[128];
-    int index = 0;
-    for (int i=0; i < 5; i++)
-                index += sprintf(&str_uid[index], "%d", uid[i]);
-
-    tcp_client(data);
-
-    if(strncmp(data, "Access granted", 8) == 0)
-        //light green diode
-    else
-        //light red diode
-        
-}*/// to do 
-
 
 void nfc_task(void *pvParameter)
 {
