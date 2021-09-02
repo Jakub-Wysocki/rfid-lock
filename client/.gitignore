@@ -5,7 +5,6 @@
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
-build/*
 
 # Local History for Visual Studio Code
 .history/
@@ -14,3 +13,8 @@ build/*
 # Ignore all local history of files
 .history
 .ionide
+
+build/
+sdkconfig
+sdkconfig.old
+sdkconfig.ci
