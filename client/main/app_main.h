@@ -19,6 +19,12 @@
 #define GPIO_BUZZER 27
 #define GPIO_RED_LED 14
 
+static const char *MQTT_TAG = "MQTT";
+
+static const char *TAG_WIFI = "WiFi";
+static const char *TAG_RFID = "RFID";
+static int s_retry_num = 0;
+
 
 
 #endif //APP_MAIN_H
