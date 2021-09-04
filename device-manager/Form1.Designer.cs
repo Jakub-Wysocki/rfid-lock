@@ -78,6 +78,7 @@ namespace device_manager
             this.AcceptCardNumber.TabIndex = 4;
             this.AcceptCardNumber.Text = "Add Token";
             this.AcceptCardNumber.UseVisualStyleBackColor = true;
+            this.AcceptCardNumber.Click += new System.EventHandler(this.AcceptCardNumber_Click);
             // 
             // RemoveTokenButton
             // 
