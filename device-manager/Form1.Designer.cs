@@ -35,6 +35,8 @@ namespace device_manager
             this.CardNumberInputBox = new System.Windows.Forms.TextBox();
             this.AcceptCardNumber = new System.Windows.Forms.Button();
             this.RemoveTokenButton = new System.Windows.Forms.Button();
+            this.UpdateListButton = new System.Windows.Forms.Button();
+            this.SaveLog = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // MqttLog
@@ -88,12 +90,34 @@ namespace device_manager
             this.RemoveTokenButton.TabIndex = 5;
             this.RemoveTokenButton.Text = "Remove Selected Token";
             this.RemoveTokenButton.UseVisualStyleBackColor = true;
+            this.RemoveTokenButton.Click += new System.EventHandler(this.RemoveTokenButton_Click);
+            // 
+            // UpdateListButton
+            // 
+            this.UpdateListButton.Location = new System.Drawing.Point(187, 67);
+            this.UpdateListButton.Name = "UpdateListButton";
+            this.UpdateListButton.Size = new System.Drawing.Size(194, 29);
+            this.UpdateListButton.TabIndex = 6;
+            this.UpdateListButton.Text = "Update List";
+            this.UpdateListButton.UseVisualStyleBackColor = true;
+            this.UpdateListButton.Click += new System.EventHandler(this.UpdateListButton_Click);
+            // 
+            // SaveLog
+            // 
+            this.SaveLog.Location = new System.Drawing.Point(694, 179);
+            this.SaveLog.Name = "SaveLog";
+            this.SaveLog.Size = new System.Drawing.Size(94, 29);
+            this.SaveLog.TabIndex = 7;
+            this.SaveLog.Text = "button1";
+            this.SaveLog.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.SaveLog);
+            this.Controls.Add(this.UpdateListButton);
             this.Controls.Add(this.RemoveTokenButton);
             this.Controls.Add(this.AcceptCardNumber);
             this.Controls.Add(this.CardNumberInputBox);
@@ -115,6 +139,8 @@ namespace device_manager
         private System.Windows.Forms.TextBox CardNumberInputBox;
         private System.Windows.Forms.Button AcceptCardNumber;
         private System.Windows.Forms.Button RemoveTokenButton;
+        private System.Windows.Forms.Button UpdateListButton;
+        private System.Windows.Forms.Button SaveLog;
     }
 }
 
