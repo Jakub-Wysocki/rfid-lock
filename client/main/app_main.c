@@ -37,6 +37,7 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
     int msg_id;
     switch (event->event_id) {
         case MQTT_EVENT_CONNECTED:
+            
             ESP_LOGI(MQTT_TAG, "MQTT_EVENT_CONNECTED");
             msg_id = esp_mqtt_client_subscribe(client, "/rfid/add", 0);
             ESP_LOGI(MQTT_TAG, "sent subscribe successful, msg_id=%d", msg_id);
@@ -54,11 +55,6 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
 
         case MQTT_EVENT_SUBSCRIBED:
             ESP_LOGI(MQTT_TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
-            
-            //msg_id = esp_mqtt_client_publish(client, "/topic/qos0", "data", 0, 0, 0);
-            //ESP_LOGI(MQTT_TAG, "sent publish successful, msg_id=%d", msg_id);
-             //publish list of allowed devices
-
             break;
         case MQTT_EVENT_UNSUBSCRIBED:
             ESP_LOGI(MQTT_TAG, "MQTT_EVENT_UNSUBSCRIBED, msg_id=%d", event->msg_id);
@@ -68,49 +64,49 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
             break;
         case MQTT_EVENT_DATA:
             
-            if(strcmp(event->topic, "/rfid/add") == 0) {
-                    //add
-
+            if(strncmp(event->topic, "/rfid/add", 7) == 0) {
                     cards = ll_new(cards);
                     cards->card_uid = event->data;
 
                     printf("DATA=%.*s\r\n", event->data_len, event->data);
                     ESP_LOGI(MQTT_TAG, "KEY %.*s ADDED!", event->data_len, event->data ); 
-            } else if(strcmp(event->topic, "/rfid/remove") == 0) {
-                    
+            } 
+            else if(strncmp(event->topic, "/rfid/remove", 7) == 0) 
+            {
                     int flag = 0;
                     ll_foreach(cards, card) {
-                        
-                        
-                        if(strcmp(card->card_uid, event->data) == 0)
+                        if(strncmp(card->card_uid, event->data, 3) == 0)
                             {
                                 cards = ll_pop(cards);
                                 flag++;
                                 msg_id = esp_mqtt_client_publish(client, "/topic/remove", "Removed from list" , 0, 1, 0);
                                 ESP_LOGI(MQTT_TAG, "sent publish successful, msg_id=%d", msg_id);
-                            }
+                            } 
+                            
                     }
 
                         if(flag == 0)
                             {
                                 msg_id = esp_mqtt_client_publish(client, "/topic/remove", "There is no card like that" , 0, 1, 0);
-                                ESP_LOGI(MQTT_TAG, "sent publish successful, msg_id=%d", msg_id);
+                                ESP_LOGI(MQTT_TAG, "sent publish successful, msg_id=%d",  msg_id);
+                            }
+                        else
+                            {
+                                ESP_LOGI(MQTT_TAG, "Hej debug patrz na to!");
                             }
 
                     printf("DATA=%.*s\r\n", event->data_len, event->data);
                     ESP_LOGI(MQTT_TAG, "KEY %.*s REMOVED!", event->data_len, event->data);
 
-            } else if(strcmp(event->topic, "/rfid/list") == 0)  { 
+            } else if(strncmp(event->topic, "/rfid/list", 7) == 0)  { 
                 
                     //publish list
                     
                     ll_foreach(cards, card) {
                         msg_id = esp_mqtt_client_publish(client, "/topic/list", card->card_uid , 0, 1, 0);
-                            ESP_LOGI(MQTT_TAG, "sent publish successful, msg_id=%d", msg_id);
+                            ESP_LOGI(MQTT_TAG, "sent %s  publish successful, msg_id=%d", card->card_uid, msg_id);
                     }
-
-                    printf("DATA=%.*s\r\n", event->data_len, event->data);
-                    ESP_LOGI(MQTT_TAG, "KEY %.*s REMOVED!", event->data_len, event->data); 
+                    printf("DATA=%s\r\n", cards->card_uid);
             } else {
                     ESP_LOGI(MQTT_TAG, "WRONG INFORMATION");
                     printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);

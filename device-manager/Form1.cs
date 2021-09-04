@@ -34,17 +34,21 @@ namespace device_manager
 
         private void RemoveTokenButton_Click(object sender, EventArgs e)
         {
-            
-            var message = new MqttApplicationMessageBuilder()
+            if(TokenListBox.SelectedItem != null)
+            {
+                var message = new MqttApplicationMessageBuilder()
                 .WithTopic("/rfid/remove")
                 .WithPayload(TokenListBox.SelectedItem.ToString())
                 .WithExactlyOnceQoS()
                 .WithRetainFlag()
                 .Build();
 
-            broker.PublishMessege(message);
+                broker.PublishMessege(message);
 
-            TokenListBox.Items.Remove(TokenListBox.SelectedItem);
+                TokenListBox.Items.Remove(TokenListBox.SelectedItem);
+
+            }
+                  
         }
 
         private void UpdateListButton_Click(object sender, EventArgs e)
