@@ -27,100 +27,123 @@
 #include "driver/gpio.h"
 #include "ll.h"
 
+struct card_uid_struct
+{
+    char card_uid[32];
+};
+
 static pn532_t nfc;
 struct card_uid_struct *cards = NULL;
-
+esp_mqtt_client_handle_t client;
 
 static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
 {
     esp_mqtt_client_handle_t client = event->client;
     int msg_id;
-    switch (event->event_id) {
-        case MQTT_EVENT_CONNECTED:
+    switch (event->event_id)
+    {
+    case MQTT_EVENT_CONNECTED:
+        ESP_LOGI(MQTT_TAG, "MQTT_EVENT_CONNECTED");
+        msg_id = esp_mqtt_client_subscribe(client, "/rfid/add", 0);
+        msg_id = esp_mqtt_client_subscribe(client, "/rfid/remove", 0);
+        msg_id = esp_mqtt_client_subscribe(client, "/rfid/list", 0);
+        break;
+    case MQTT_EVENT_DISCONNECTED:
+        ESP_LOGI(MQTT_TAG, "MQTT_EVENT_DISCONNECTED");
+        break;
+    case MQTT_EVENT_SUBSCRIBED:
+        ESP_LOGI(MQTT_TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
+        break;
+    case MQTT_EVENT_UNSUBSCRIBED:
+        ESP_LOGI(MQTT_TAG, "MQTT_EVENT_UNSUBSCRIBED, msg_id=%d", event->msg_id);
+        break;
+    case MQTT_EVENT_PUBLISHED:
+        ESP_LOGI(MQTT_TAG, "MQTT_EVENT_PUBLISHED, msg_id=%d", event->msg_id);
+        break;
+    case MQTT_EVENT_DATA:
+
+        if (strncmp(event->topic, "/rfid/add", 7) == 0)
+        {
+            char tmp_str[32];
+
+            for(int i = 0; i < event->data_len; i++)
+                tmp_str[i] = event->data[i];
+
+            tmp_str[event->data_len + 1] = 0;
+
+            cards = ll_new(cards);
+            strcpy(cards->card_uid, tmp_str);
             
-            ESP_LOGI(MQTT_TAG, "MQTT_EVENT_CONNECTED");
-            msg_id = esp_mqtt_client_subscribe(client, "/rfid/add", 0);
-            ESP_LOGI(MQTT_TAG, "sent subscribe successful, msg_id=%d", msg_id);
-
-            msg_id = esp_mqtt_client_subscribe(client, "/rfid/remove", 0);
-            ESP_LOGI(MQTT_TAG, "sent subscribe successful, msg_id=%d", msg_id);
-
-            msg_id = esp_mqtt_client_subscribe(client, "/rfid/list", 0);
-            ESP_LOGI(MQTT_TAG, "sent subscribe successful, msg_id=%d", msg_id);
-
-            break;
-        case MQTT_EVENT_DISCONNECTED:
-            ESP_LOGI(MQTT_TAG, "MQTT_EVENT_DISCONNECTED");
-            break;
-
-        case MQTT_EVENT_SUBSCRIBED:
-            ESP_LOGI(MQTT_TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
-            break;
-        case MQTT_EVENT_UNSUBSCRIBED:
-            ESP_LOGI(MQTT_TAG, "MQTT_EVENT_UNSUBSCRIBED, msg_id=%d", event->msg_id);
-            break;
-        case MQTT_EVENT_PUBLISHED:
-            ESP_LOGI(MQTT_TAG, "MQTT_EVENT_PUBLISHED, msg_id=%d", event->msg_id);
-            break;
-        case MQTT_EVENT_DATA:
-            
-            if(strncmp(event->topic, "/rfid/add", 7) == 0) {
-                    cards = ll_new(cards);
-                    cards->card_uid = event->data;
-
-                    printf("DATA=%.*s\r\n", event->data_len, event->data);
-                    ESP_LOGI(MQTT_TAG, "KEY %.*s ADDED!", event->data_len, event->data ); 
-            } 
-            else if(strncmp(event->topic, "/rfid/remove", 7) == 0) 
+            printf("ADDED DEVICE %s\r\n", cards->card_uid);
+        }
+        else if (strncmp(event->topic, "/rfid/remove", 7) == 0)
+        {
+            if(cards == NULL)
             {
-                    int flag = 0;
-                    ll_foreach(cards, card) {
-                        if(strncmp(card->card_uid, event->data, 3) == 0)
-                            {
-                                cards = ll_pop(cards);
-                                flag++;
-                                msg_id = esp_mqtt_client_publish(client, "/topic/remove", "Removed from list" , 0, 1, 0);
-                                ESP_LOGI(MQTT_TAG, "sent publish successful, msg_id=%d", msg_id);
-                            } 
-                            
-                    }
+                msg_id = esp_mqtt_client_publish(client, "/topic/remove", "NO DEVICES", 0, 1, 0);
+                break;
+            }
 
-                        if(flag == 0)
-                            {
-                                msg_id = esp_mqtt_client_publish(client, "/topic/remove", "There is no card like that" , 0, 1, 0);
-                                ESP_LOGI(MQTT_TAG, "sent publish successful, msg_id=%d",  msg_id);
-                            }
-                        else
-                            {
-                                ESP_LOGI(MQTT_TAG, "Hej debug patrz na to!");
-                            }
+            int flag = 0;
+            char tmp_str[32];
 
-                    printf("DATA=%.*s\r\n", event->data_len, event->data);
-                    ESP_LOGI(MQTT_TAG, "KEY %.*s REMOVED!", event->data_len, event->data);
+            for(int i = 0; i < event->data_len; i++)
+                tmp_str[i] = event->data[i];
 
-            } else if(strncmp(event->topic, "/rfid/list", 7) == 0)  { 
+            tmp_str[event->data_len + 1] = 0;
+
+
+            printf("RECEIVED DATA=%s\r\n", tmp_str);
+
+            ll_foreach(cards, card)
+            {
+                printf("COMPARED DATA: %s\r\n", card->card_uid);
+
+                if (strncmp(card->card_uid, event->data, 3) == 0)
+                {
+                    cards = ll_pop(cards);
+                    flag++;
+                    msg_id = esp_mqtt_client_publish(client, "/topic/remove", "REMOVED", 0, 1, 0);
+                }
+            }
+
+            if (flag == 0)
+                msg_id = esp_mqtt_client_publish(client, "/topic/remove", "NO DEVICE", 0, 1, 0);
+        }
+        else if (strncmp(event->topic, "/rfid/list", 7) == 0)
+        {
+            if(cards == NULL)
+            {
+                msg_id = esp_mqtt_client_publish(client, "/topic/remove", "NO DEVICES", 0, 1, 0);
+                break;
+            }
+
+            ll_foreach(cards, card)
+            {
+                printf("CARD = %s\r\n", card->card_uid);
+                msg_id = esp_mqtt_client_publish(client, "/topic/list", card->card_uid, 0, 1, 0);
                 
-                    //publish list
-                    
-                    ll_foreach(cards, card) {
-                        msg_id = esp_mqtt_client_publish(client, "/topic/list", card->card_uid , 0, 1, 0);
-                            ESP_LOGI(MQTT_TAG, "sent %s  publish successful, msg_id=%d", card->card_uid, msg_id);
-                    }
-                    printf("DATA=%s\r\n", cards->card_uid);
-            } else {
-                    ESP_LOGI(MQTT_TAG, "WRONG INFORMATION");
-                    printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
-                    printf("DATA=%.*s\r\n", event->data_len, event->data); }
-            break;
-        case MQTT_EVENT_ERROR:
-            ESP_LOGI(MQTT_TAG, "MQTT_EVENT_ERROR");
-            break;
-        default:
-            ESP_LOGI(MQTT_TAG, "Other event id:%d", event->event_id);
-            break;
+            }
+            
+        }
+        else
+        {
+            ESP_LOGI(MQTT_TAG, "WRONG TOPIC");
+            printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
+            printf("DATA=%.*s\r\n", event->data_len, event->data);
+        }
+
+        break;
+    case MQTT_EVENT_ERROR:
+        ESP_LOGI(MQTT_TAG, "MQTT_EVENT_ERROR");
+        break;
+    default:
+        ESP_LOGI(MQTT_TAG, "Other event id:%d", event->event_id);
+        break;
     }
     return ESP_OK;
 }
+
 
 void nfc_task(void *pvParameter)
 {
@@ -213,8 +236,8 @@ void access_attempt(char* str_uid)
 
 }*/
 
-
-static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data) {
+static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
+{
     ESP_LOGD(MQTT_TAG, "Event dispatched from event loop base=%s, event_id=%d", base, event_id);
     mqtt_event_handler_cb(event_data);
 }
@@ -225,7 +248,7 @@ static void mqtt_app_start(void)
         .uri = CONFIG_BROKER_URL,
     };
 
-    esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
+    client = esp_mqtt_client_init(&mqtt_cfg);
     esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler, client);
     esp_mqtt_client_start(client);
 }
@@ -252,6 +275,6 @@ void app_main(void)
     ESP_ERROR_CHECK(example_connect());
 
     mqtt_app_start(); //there could be an error with nfc task priority
-
-    //xTaskCreate(&nfc_task, "nfc_task", 4096, NULL, 1, NULL);
+    //xTaskCreate(&mqtt_app_start, "mqtt", 4096, NULL, 1, NULL);
+    xTaskCreate(&nfc_task, "nfc_task", 4096, NULL, 1, NULL);
 }

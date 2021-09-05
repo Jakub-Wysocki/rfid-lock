@@ -13,6 +13,7 @@ namespace device_manager
     public class MqttBroker
     {
         private static int MessageCounter = 0;
+       
 
         private IMqttServer mqttServer;
         public MqttBroker()
@@ -32,7 +33,28 @@ namespace device_manager
 
 
             BrokerInit(optionsBuilder);
+
+
+
+            mqttServer.UseApplicationMessageReceivedHandler(e =>
+            {
+                try
+                {
+                    string topic = e.ApplicationMessage.Topic;
+                    if (string.IsNullOrWhiteSpace(topic) == false)
+                    {
+                        string payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
+                        System.Windows.Forms.MessageBox.Show($"Topic: {topic}. Message Received: {payload}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.Forms.MessageBox.Show(ex.Message);
+                }
+            });
+
         }
+
 
         private async void BrokerInit(MqttServerOptionsBuilder optionsBuilder)
         {
@@ -69,8 +91,11 @@ namespace device_manager
         {
 
             await mqttServer.PublishAsync(message, CancellationToken.None);
-
+            
         }
+
+        
+       
 
 
     }

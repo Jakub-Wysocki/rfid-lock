@@ -17,13 +17,21 @@ namespace device_manager
             broker = new();
         }
 
+   /*     private void HandleReceivedApplicationMessage(MqttApplicationMessageReceivedEventArgs x)
+        {
+          
+                MessageBox.Show(x.ApplicationMessage.Topic.ToString());
+            
+        }*/
+
+
         private void AcceptCardNumber_Click(object sender, EventArgs e)
         {
-            TokenListBox.Items.Add(CardNumberInputBox.Text);
+            TokenListBox.Items.Add(CardNumberInputBox.Text.ToString());
 
             var message = new MqttApplicationMessageBuilder()
                 .WithTopic("/rfid/add")
-                .WithPayload(CardNumberInputBox.Text)
+                .WithPayload(CardNumberInputBox.Text.ToString())
                 .WithExactlyOnceQoS()
                 .WithRetainFlag()
                 .Build();

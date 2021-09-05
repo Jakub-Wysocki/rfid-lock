@@ -11,8 +11,4 @@
 static const char *MQTT_TAG = "MQTT";
 static const char *TAG_RFID = "RFID";
 
-struct card_uid_struct {
-    char *card_uid;
-};
-
 #endif //APP_MAIN_H
