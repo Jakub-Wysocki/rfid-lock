@@ -39,14 +39,13 @@ esp_mqtt_client_handle_t client;
 static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
 {
     esp_mqtt_client_handle_t client = event->client;
-    int msg_id;
     switch (event->event_id)
     {
     case MQTT_EVENT_CONNECTED:
         ESP_LOGI(MQTT_TAG, "MQTT_EVENT_CONNECTED");
-        msg_id = esp_mqtt_client_subscribe(client, "/rfid/add", 0);
-        msg_id = esp_mqtt_client_subscribe(client, "/rfid/remove", 0);
-        msg_id = esp_mqtt_client_subscribe(client, "/rfid/list", 0);
+         esp_mqtt_client_subscribe(client, "/rfid/add", 0);
+         esp_mqtt_client_subscribe(client, "/rfid/remove", 0);
+         esp_mqtt_client_subscribe(client, "/rfid/list", 0);
         break;
     case MQTT_EVENT_DISCONNECTED:
         ESP_LOGI(MQTT_TAG, "MQTT_EVENT_DISCONNECTED");
@@ -80,7 +79,7 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
         {
             if(cards == NULL)
             {
-                msg_id = esp_mqtt_client_publish(client, "/topic/remove", "NO DEVICES", 0, 1, 0);
+                 esp_mqtt_client_publish(client, "/topic/remove", "NO DEVICES", 0, 1, 0);
                 break;
             }
 
@@ -103,25 +102,25 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
                 {
                     cards = ll_pop(cards);
                     flag++;
-                    msg_id = esp_mqtt_client_publish(client, "/topic/remove", "REMOVED", 0, 1, 0);
+                     esp_mqtt_client_publish(client, "/topic/remove", "REMOVED", 0, 1, 0);
                 }
             }
 
             if (flag == 0)
-                msg_id = esp_mqtt_client_publish(client, "/topic/remove", "NO DEVICE", 0, 1, 0);
+                esp_mqtt_client_publish(client, "/topic/remove", "NO DEVICE", 0, 1, 0);
         }
         else if (strncmp(event->topic, "/rfid/list", 7) == 0)
         {
             if(cards == NULL)
             {
-                msg_id = esp_mqtt_client_publish(client, "/topic/remove", "NO DEVICES", 0, 1, 0);
+                 esp_mqtt_client_publish(client, "/topic/remove", "NO DEVICES", 0, 1, 0);
                 break;
             }
 
             ll_foreach(cards, card)
             {
                 printf("CARD = %s\r\n", card->card_uid);
-                msg_id = esp_mqtt_client_publish(client, "/topic/list", card->card_uid, 0, 1, 0);
+                esp_mqtt_client_publish(client, "/topic/list", card->card_uid, 0, 1, 0);
                 
             }
             
@@ -144,6 +143,37 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
     return ESP_OK;
 }
 
+//function handles access attempt. 
+void access_attempt(char* str_uid)
+{
+    char result[160];
+    int flag = 0;
+
+    printf("RECEIVED CARD = %s\n", str_uid);
+
+    ll_foreach(cards, card)
+    {
+        printf("CHECKING CARD = %s\n", card->card_uid);
+
+
+        if(strncmp(card->card_uid, str_uid, 8) == 0)
+            {
+                strcpy(result , "Access granted to: ");
+                flag++;
+                esp_mqtt_client_publish(client, "/topic/log", strcat(result, str_uid) , 0, 1, 0);
+            }
+    }
+
+    if(flag == 0)
+        {
+            strcpy(result , "Access denied to: ");
+            esp_mqtt_client_publish(client, "/topic/log", strcat(result, str_uid) , 0, 1, 0);
+        }
+        else
+            ESP_LOGI(MQTT_TAG, "Hej debug patrz na to! Access_attempt");
+
+
+}
 
 void nfc_task(void *pvParameter)
 {
@@ -193,7 +223,7 @@ void nfc_task(void *pvParameter)
             for (int i=0; i < 5; i++)
                 index += sprintf(&str_uid[index], "%d", uid[i]);
 
-            //access_attempt(str_uid);
+            access_attempt(str_uid);
 
         }
         else
@@ -204,37 +234,8 @@ void nfc_task(void *pvParameter)
     }
 }
 
-/*
-//function handles access attempt. 
-void access_attempt(char* str_uid)
-{
-    char result[160];
 
-    ll_foreach(cards, card)
-    {
-        int flag = 0;
-        if(strcmp(card->card_uid, event->data) == 0)
-            {
-                result = "Access granted to: "
-                flag++;
-                msg_id = esp_mqtt_client_publish(client, "/topic/log", strcat(result, str_uid) , 0, 1, 0);
-                ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
-            }
 
-        if(flag == 0)
-        {
-            result = "Access denied to: "
-            msg_id = esp_mqtt_client_publish(client, "/topic/log", strcat(result, str_uid) , 0, 1, 0);
-            ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
-        }
-        else
-        {
-            ESP_LOGI(TAG, "Hej debug patrz na to! Access_attempt msg_id=%d", msg_id);
-        }
-
-    }
-
-}*/
 
 static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
@@ -275,6 +276,5 @@ void app_main(void)
     ESP_ERROR_CHECK(example_connect());
 
     mqtt_app_start(); //there could be an error with nfc task priority
-    //xTaskCreate(&mqtt_app_start, "mqtt", 4096, NULL, 1, NULL);
-    xTaskCreate(&nfc_task, "nfc_task", 4096, NULL, 1, NULL);
+    xTaskCreate(&nfc_task, "nfc_task", 4096, NULL, 5, NULL);
 }
