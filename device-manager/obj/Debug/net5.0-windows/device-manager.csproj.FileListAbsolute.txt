@@ -6,8 +6,6 @@ C:\Users\wysoc\Projekty\rfid-lock\device-manager\bin\Debug\net5.0-windows\device
 C:\Users\wysoc\Projekty\rfid-lock\device-manager\bin\Debug\net5.0-windows\ref\device-manager.dll
 C:\Users\wysoc\Projekty\rfid-lock\device-manager\bin\Debug\net5.0-windows\device-manager.pdb
 C:\Users\wysoc\Projekty\rfid-lock\device-manager\bin\Debug\net5.0-windows\MQTTnet.dll
-C:\Users\wysoc\Projekty\rfid-lock\device-manager\bin\Debug\net5.0-windows\Serilog.dll
-C:\Users\wysoc\Projekty\rfid-lock\device-manager\bin\Debug\net5.0-windows\Serilog.Sinks.WinForms.dll
 C:\Users\wysoc\Projekty\rfid-lock\device-manager\obj\Debug\net5.0-windows\device-manager.csprojAssemblyReference.cache
 C:\Users\wysoc\Projekty\rfid-lock\device-manager\obj\Debug\net5.0-windows\device_manager.Form1.resources
 C:\Users\wysoc\Projekty\rfid-lock\device-manager\obj\Debug\net5.0-windows\device-manager.csproj.GenerateResource.cache

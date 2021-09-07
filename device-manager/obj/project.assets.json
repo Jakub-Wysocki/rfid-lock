@@ -10,27 +10,6 @@
         "runtime": {
           "lib/net5.0/MQTTnet.dll": {}
         }
-      },
-      "Serilog/2.10.0": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.1/Serilog.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard2.1/Serilog.dll": {}
-        }
-      },
-      "Serilog.Sinks.WinForms/2.3.1": {
-        "type": "package",
-        "dependencies": {
-          "Serilog": "2.10.0"
-        },
-        "compile": {
-          "lib/net46/Serilog.Sinks.WinForms.dll": {}
-        },
-        "runtime": {
-          "lib/net46/Serilog.Sinks.WinForms.dll": {}
-        }
       }
     }
   },
@@ -61,49 +40,11 @@
         "mqttnet.3.0.16.nupkg.sha512",
         "mqttnet.nuspec"
       ]
-    },
-    "Serilog/2.10.0": {
-      "sha512": "+QX0hmf37a0/OZLxM3wL7V6/ADvC1XihXN4Kq/p6d8lCPfgkRdiuhbWlMaFjR9Av0dy5F0+MBeDmDdRZN/YwQA==",
-      "type": "package",
-      "path": "serilog/2.10.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "icon.png",
-        "lib/net45/Serilog.dll",
-        "lib/net45/Serilog.xml",
-        "lib/net46/Serilog.dll",
-        "lib/net46/Serilog.xml",
-        "lib/netstandard1.0/Serilog.dll",
-        "lib/netstandard1.0/Serilog.xml",
-        "lib/netstandard1.3/Serilog.dll",
-        "lib/netstandard1.3/Serilog.xml",
-        "lib/netstandard2.0/Serilog.dll",
-        "lib/netstandard2.0/Serilog.xml",
-        "lib/netstandard2.1/Serilog.dll",
-        "lib/netstandard2.1/Serilog.xml",
-        "serilog.2.10.0.nupkg.sha512",
-        "serilog.nuspec"
-      ]
-    },
-    "Serilog.Sinks.WinForms/2.3.1": {
-      "sha512": "U0rHZLGcyuc53UN5Qsxo5VQ3RkSsXphdRhiLS/V4b7yAwTI9cu8QP/6fXPXEhVlS2PJMnlVvyENZVSQJbGvp0w==",
-      "type": "package",
-      "path": "serilog.sinks.winforms/2.3.1",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "lib/net46/Serilog.Sinks.WinForms.dll",
-        "serilog.sinks.winforms.2.3.1.nupkg.sha512",
-        "serilog.sinks.winforms.nuspec"
-      ]
     }
   },
   "projectFileDependencyGroups": {
     "net5.0-windows7.0": [
-      "MQTTnet >= 3.0.16",
-      "Serilog >= 2.10.0",
-      "Serilog.Sinks.WinForms >= 2.3.1"
+      "MQTTnet >= 3.0.16"
     ]
   },
   "packageFolders": {
@@ -148,14 +89,6 @@
           "MQTTnet": {
             "target": "Package",
             "version": "[3.0.16, )"
-          },
-          "Serilog": {
-            "target": "Package",
-            "version": "[2.10.0, )"
-          },
-          "Serilog.Sinks.WinForms": {
-            "target": "Package",
-            "version": "[2.3.1, )"
           }
         },
         "imports": [
@@ -179,17 +112,5 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.203\\RuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1701",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Pakiet „Serilog.Sinks.WinForms 2.3.1” został przywrócony przy użyciu elementu „.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8” zamiast platformy docelowej projektu „net5.0-windows7.0”. Ten pakiet może nie być w pełni kompatybilny z Twoim projektem.",
-      "libraryId": "Serilog.Sinks.WinForms",
-      "targetGraphs": [
-        "net5.0-windows7.0"
-      ]
-    }
-  ]
+  }
 }

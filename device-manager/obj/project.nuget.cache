@@ -1,23 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "jiuAfvgGD3XjQNOj6nLp5IBDC3QQNOi3PWAcJXotUldxVMPHQPNczksng15Y8cy33BxJX5AgmHoXzIk/b/TdBQ==",
+  "dgSpecHash": "acmzPNgEfOB3hkGTH/sQp9bT/FD1FnVITsqkN7nj62X7k8PXmqavE5p2UhRzE/QijovYYR3T05w0AJ1lSw3qzQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\wysoc\\Projekty\\rfid-lock\\device-manager\\device-manager.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\wysoc\\.nuget\\packages\\mqttnet\\3.0.16\\mqttnet.3.0.16.nupkg.sha512",
-    "C:\\Users\\wysoc\\.nuget\\packages\\serilog\\2.10.0\\serilog.2.10.0.nupkg.sha512",
-    "C:\\Users\\wysoc\\.nuget\\packages\\serilog.sinks.winforms\\2.3.1\\serilog.sinks.winforms.2.3.1.nupkg.sha512"
+    "C:\\Users\\wysoc\\.nuget\\packages\\mqttnet\\3.0.16\\mqttnet.3.0.16.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1701",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Pakiet „Serilog.Sinks.WinForms 2.3.1” został przywrócony przy użyciu elementu „.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8” zamiast platformy docelowej projektu „net5.0-windows7.0”. Ten pakiet może nie być w pełni kompatybilny z Twoim projektem.",
-      "libraryId": "Serilog.Sinks.WinForms",
-      "targetGraphs": [
-        "net5.0-windows7.0"
-      ]
-    }
-  ]
+  "logs": []
 }

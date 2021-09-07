@@ -13,25 +13,6 @@
             "fileVersion": "3.0.16.0"
           }
         }
-      },
-      "Serilog/2.10.0": {
-        "runtime": {
-          "lib/netstandard2.1/Serilog.dll": {
-            "assemblyVersion": "2.0.0.0",
-            "fileVersion": "2.10.0.0"
-          }
-        }
-      },
-      "Serilog.Sinks.WinForms/2.3.1": {
-        "dependencies": {
-          "Serilog": "2.10.0"
-        },
-        "runtime": {
-          "lib/net46/Serilog.Sinks.WinForms.dll": {
-            "assemblyVersion": "2.3.1.0",
-            "fileVersion": "2.3.1.0"
-          }
-        }
       }
     }
   },
@@ -42,20 +23,6 @@
       "sha512": "sha512-xzqmKwVjTpT/X5zoLuhBCHmYVSRAlxeXqExvHLqfbt5OfTHfrD/q62IteJbOtlNG/SepeRpm76dYUZSU5o8y1A==",
       "path": "mqttnet/3.0.16",
       "hashPath": "mqttnet.3.0.16.nupkg.sha512"
-    },
-    "Serilog/2.10.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-+QX0hmf37a0/OZLxM3wL7V6/ADvC1XihXN4Kq/p6d8lCPfgkRdiuhbWlMaFjR9Av0dy5F0+MBeDmDdRZN/YwQA==",
-      "path": "serilog/2.10.0",
-      "hashPath": "serilog.2.10.0.nupkg.sha512"
-    },
-    "Serilog.Sinks.WinForms/2.3.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-U0rHZLGcyuc53UN5Qsxo5VQ3RkSsXphdRhiLS/V4b7yAwTI9cu8QP/6fXPXEhVlS2PJMnlVvyENZVSQJbGvp0w==",
-      "path": "serilog.sinks.winforms/2.3.1",
-      "hashPath": "serilog.sinks.winforms.2.3.1.nupkg.sha512"
     }
   }
 }
