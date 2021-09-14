@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "acmzPNgEfOB3hkGTH/sQp9bT/FD1FnVITsqkN7nj62X7k8PXmqavE5p2UhRzE/QijovYYR3T05w0AJ1lSw3qzQ==",
+  "dgSpecHash": "JiTnD7vkZa077niu6PmraTti4/gtS49ZIp5nxDWYJJ0ON27H4OT+5Z4CfnVLeLsCvWGrUvdfStypYsXoRucGMg==",
   "success": true,
   "projectFilePath": "C:\\Users\\wysoc\\Projekty\\rfid-lock\\device-manager\\device-manager.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\wysoc\\.nuget\\packages\\csvhelper\\27.1.1\\csvhelper.27.1.1.nupkg.sha512",
     "C:\\Users\\wysoc\\.nuget\\packages\\mqttnet\\3.0.16\\mqttnet.3.0.16.nupkg.sha512"
   ],
   "logs": []

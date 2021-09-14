@@ -70,6 +70,12 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
 
             tmp_str[event->data_len + 1] = 0;
 
+            ll_foreach(cards, card)
+            {
+                if(strncmp(card->card_uid,tmp_str,5) == 0)
+                    break;  
+            }
+
             cards = ll_new(cards);
             strcpy(cards->card_uid, tmp_str);
             
@@ -91,7 +97,6 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
 
             tmp_str[event->data_len + 1] = 0;
 
-
             printf("RECEIVED DATA=%s\r\n", tmp_str);
 
             ll_foreach(cards, card)
@@ -102,12 +107,11 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
                 {
                     cards = ll_pop(cards);
                     flag++;
-                     esp_mqtt_client_publish(client, "/topic/remove", "REMOVED", 0, 1, 0);
+                    printf("REMOVED DATA: %s\r\n", card->card_uid);
+                    esp_mqtt_client_publish(client, "/topic/remove", "REMOVED", 0, 1, 0);
                 }
             }
 
-            if (flag == 0)
-                esp_mqtt_client_publish(client, "/topic/remove", "NO DEVICE", 0, 1, 0);
         }
         else if (strncmp(event->topic, "/rfid/list", 7) == 0)
         {

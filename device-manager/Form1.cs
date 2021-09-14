@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using MQTTnet.Server;
 using System.Text;
 using System.Linq;
+using System.IO;
+using CsvHelper;
+using System.Globalization;
 
 namespace device_manager
 {
@@ -18,6 +21,7 @@ namespace device_manager
         {
             InitializeComponent();
             BrokerInit();
+
         }
 
 
@@ -49,7 +53,8 @@ namespace device_manager
                 .Build();
 
             PublishMessege(message);
-         
+
+            CardNumberInputBox.Clear();
         }
 
         private void RemoveTokenButton_Click(object sender, EventArgs e)
@@ -79,6 +84,8 @@ namespace device_manager
                 .WithExactlyOnceQoS()
                 .WithRetainFlag()
                 .Build();
+
+            ClearTokenBox();
 
             PublishMessege(message);
         }
@@ -190,10 +197,10 @@ namespace device_manager
                     {
                         string parsedMessage = System.Text.RegularExpressions.Regex.Replace(message, "[^0-9]", "").Trim();
 
-                        if(!TokenListBox.Items.Contains(parsedMessage))
-                            AppendTokenBox(parsedMessage);
+                        AppendTokenBox(parsedMessage);
+                        AppendLog("Sync device from ESP: " + parsedMessage);
+                        
 
-                        AppendLog("Updated from device" + parsedMessage);
 
                     }
                     break;
@@ -212,6 +219,41 @@ namespace device_manager
 
         }
 
+        private void ExportToCsvButton_Click(object sender, EventArgs e)
+        {
+
+            SaveFileDialog saveFileDialog1 = new();
+
+            saveFileDialog1.Filter = "CSV file (*.csv)|*.csv";
+            saveFileDialog1.FilterIndex = 2;
+            saveFileDialog1.RestoreDirectory = true;
+
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                if(!saveFileDialog1.CheckFileExists)
+                {
+                    StreamWriter myOutputStream = new(Path.GetFullPath(saveFileDialog1.FileName));
+
+                    foreach (var item in MqttLog.Items)
+                    {
+                        myOutputStream.WriteLine(item.ToString());
+                    }
+
+                    myOutputStream.Close();
+                }
+
+                
+
+            }
+        }
+
+        private void SortButton_Click(object sender, EventArgs e)
+        {
+            
+            TokenListBox.Sorted = !TokenListBox.Sorted;
+        }
+
 
     }
 }
+ 
