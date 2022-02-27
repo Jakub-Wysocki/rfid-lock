@@ -80,19 +80,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\wysoc\\.nuget\\packages\\": {}
+    "C:\\Users\\jkwy\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\wysoc\\Projekty\\rfid-lock\\device-manager\\device-manager.csproj",
+      "projectUniqueName": "C:\\Users\\jkwy\\source\\repos\\rfid-lock\\device-manager\\device-manager.csproj",
       "projectName": "device-manager",
-      "projectPath": "C:\\Users\\wysoc\\Projekty\\rfid-lock\\device-manager\\device-manager.csproj",
-      "packagesPath": "C:\\Users\\wysoc\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\wysoc\\Projekty\\rfid-lock\\device-manager\\obj\\",
+      "projectPath": "C:\\Users\\jkwy\\source\\repos\\rfid-lock\\device-manager\\device-manager.csproj",
+      "packagesPath": "C:\\Users\\jkwy\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\jkwy\\source\\repos\\rfid-lock\\device-manager\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\wysoc\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\jkwy\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -145,7 +145,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.203\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.200\\RuntimeIdentifierGraph.json"
       }
     }
   }

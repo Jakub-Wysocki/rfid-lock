@@ -16,7 +16,8 @@ namespace device_manager
     public partial class Form1 : Form
     {
         private IMqttServer mqttServer;
-    
+        private string selectedTopic;
+
         public Form1()
         {
             InitializeComponent();
@@ -24,30 +25,30 @@ namespace device_manager
 
         }
 
-
         private void AcceptCardNumber_Click(object sender, EventArgs e)
         {
-            string cardNumber = CardNumberInputBox.Text.ToString();
+            string user_message = CardNumberInputBox.Text.ToString();
 
-            
-
-
-            if (!(cardNumber.All(char.IsDigit) &&  !String.IsNullOrEmpty(cardNumber)))
+            if(string.IsNullOrEmpty(selectedTopic))
             {
-                MessageBox.Show("Only numbers are allowed");
+                MessageBox.Show("Wrong topic ");
                 return;
-            }
-            else if(TokenListBox.Items.Contains(cardNumber))
+            } else if(string.IsNullOrEmpty(user_message))
             {
-                MessageBox.Show("Number already on the list");
+                MessageBox.Show("Wrong message");
                 return;
-            }
+            } else if(selectedTopic != "/eink/message" && !int.TryParse(user_message, out _))
+            {
 
-            TokenListBox.Items.Add(cardNumber);
+                MessageBox.Show("Should be number");
+                return ;
+            }
+            //add font sizes verification
+
 
             var message = new MqttApplicationMessageBuilder()
-                .WithTopic("/rfid/add")
-                .WithPayload(cardNumber)
+                .WithTopic(selectedTopic)
+                .WithPayload(user_message)
                 .WithExactlyOnceQoS()
                 .WithRetainFlag()
                 .Build();
@@ -55,39 +56,6 @@ namespace device_manager
             PublishMessege(message);
 
             CardNumberInputBox.Clear();
-        }
-
-        private void RemoveTokenButton_Click(object sender, EventArgs e)
-        {
-            if(TokenListBox.SelectedItem != null)
-            {
-                var message = new MqttApplicationMessageBuilder()
-                .WithTopic("/rfid/remove")
-                .WithPayload(TokenListBox.SelectedItem.ToString())
-                .WithExactlyOnceQoS()
-                .WithRetainFlag()
-                .Build();
-
-                PublishMessege(message);
-
-                TokenListBox.Items.Remove(TokenListBox.SelectedItem);
-
-            }
-                  
-        }
-
-        private void UpdateListButton_Click(object sender, EventArgs e)
-        {
-            var message = new MqttApplicationMessageBuilder()
-                .WithTopic("/rfid/list")
-                .WithPayload("update")
-                .WithExactlyOnceQoS()
-                .WithRetainFlag()
-                .Build();
-
-            ClearTokenBox();
-
-            PublishMessege(message);
         }
 
         void AppendLog(string messege)
@@ -98,31 +66,11 @@ namespace device_manager
             {
                 MqttLog.Invoke(new Action<string>(AppendLog), time + " " + messege);
             }
-                
+
             else
             {
-               MqttLog.Items.Add(time + " " + messege);
+                MqttLog.Items.Add(time + " " + messege);
             }
-                
-        }
-
-        void AppendTokenBox(string messege)
-        {
-
-            if (TokenListBox.InvokeRequired)
-                TokenListBox.Invoke(new Action<string>(AppendTokenBox), messege);
-            else
-                TokenListBox.Items.Add(messege);
-
-        }
-
-        void ClearTokenBox()
-        {
-
-            if (TokenListBox.InvokeRequired)
-                TokenListBox.Invoke(new Action(ClearTokenBox));
-            else
-                TokenListBox.Items.Clear();
 
         }
 
@@ -149,65 +97,21 @@ namespace device_manager
 
             //AppendText( );
 
-            
+
         }
         private void OnNewMessage(MqttApplicationMessageInterceptorContext context)
         {
             string message = context.ApplicationMessage.ConvertPayloadToString();
-            string topic = context.ApplicationMessage.Topic;            
+            string topic = context.ApplicationMessage.Topic;
             string log = "Topic:  " + topic + "Message: " + message;
 
-           switch (topic)
+            switch (topic)
             {
                 case "/topic/log":
                     AppendLog(log);
                     break;
 
-                case "/topic/remove":
-
-                    if (message == "REMOVED")
-                    {
-                        AppendLog(log);
-                    }
-                    else if (message == "NO DEVICES")
-                    {
-                        AppendLog(log);
-                        ClearTokenBox();
-                    }
-
-                   break;
-                case "/topic/add":
-
-                    if (message.StartsWith("ADDED DEVICE"))
-                    {
-                        AppendLog(log);
-                    }
-                    else
-                        AppendLog(log);
-
-                    break;
-                case "/topic/list":
-
-                    if (message == "NO DEVICES")
-                    {
-                        AppendLog(log);
-                        ClearTokenBox();
-                    }
-                    else
-                    {
-                        string parsedMessage = System.Text.RegularExpressions.Regex.Replace(message, "[^0-9]", "").Trim();
-
-                        AppendTokenBox(parsedMessage);
-                        AppendLog("Sync device from ESP: " + parsedMessage);
-                        
-
-
-                    }
-                    break;
-
             }
-
-            //var payload = context.ApplicationMessage?.Payload == null ? null : Encoding.UTF8.GetString(context.ApplicationMessage?.Payload);
 
 
         }
@@ -230,7 +134,7 @@ namespace device_manager
 
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                if(!saveFileDialog1.CheckFileExists)
+                if (!saveFileDialog1.CheckFileExists)
                 {
                     StreamWriter myOutputStream = new(Path.GetFullPath(saveFileDialog1.FileName));
 
@@ -242,18 +146,34 @@ namespace device_manager
                     myOutputStream.Close();
                 }
 
-                
+
 
             }
         }
 
-        private void SortButton_Click(object sender, EventArgs e)
+        private void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            
-            TokenListBox.Sorted = !TokenListBox.Sorted;
+           string topic;
+
+           switch(comboBox1.SelectedItem.ToString())
+            {
+                case "Message":
+                    topic = "message";
+                    break;
+                case "Time":
+                    topic = "time";
+                    break;
+                case "Font Size":
+                    topic = "font-size";
+                    break;
+                default:
+                    MessageBox.Show("Wrong topic!");
+                    return;
+
+            }
+ 
+            selectedTopic = "/eink/" + topic;
+
         }
-
-
     }
 }
- 

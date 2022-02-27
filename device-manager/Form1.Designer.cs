@@ -29,71 +29,42 @@ namespace device_manager
         /// </summary>
         private void InitializeComponent()
         {
-            this.TokenListBox = new System.Windows.Forms.ListBox();
             this.LogLabel = new System.Windows.Forms.Label();
             this.CardNumberInputBox = new System.Windows.Forms.TextBox();
             this.AcceptCardNumber = new System.Windows.Forms.Button();
-            this.RemoveTokenButton = new System.Windows.Forms.Button();
-            this.UpdateListButton = new System.Windows.Forms.Button();
             this.MqttLog = new System.Windows.Forms.ListBox();
-            this.ExportToCsvButton = new System.Windows.Forms.Button();
-            this.SortButton = new System.Windows.Forms.Button();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
-            // 
-            // TokenListBox
-            // 
-            this.TokenListBox.FormattingEnabled = true;
-            this.TokenListBox.ItemHeight = 20;
-            this.TokenListBox.Location = new System.Drawing.Point(12, 12);
-            this.TokenListBox.Name = "TokenListBox";
-            this.TokenListBox.Size = new System.Drawing.Size(200, 164);
-            this.TokenListBox.TabIndex = 1;
             // 
             // LogLabel
             // 
             this.LogLabel.AutoSize = true;
-            this.LogLabel.Location = new System.Drawing.Point(12, 179);
+            this.LogLabel.Location = new System.Drawing.Point(10, 134);
             this.LogLabel.Name = "LogLabel";
-            this.LogLabel.Size = new System.Drawing.Size(126, 20);
+            this.LogLabel.Size = new System.Drawing.Size(101, 15);
             this.LogLabel.TabIndex = 2;
             this.LogLabel.Text = "Log from devices:";
             // 
             // CardNumberInputBox
             // 
-            this.CardNumberInputBox.Location = new System.Drawing.Point(218, 114);
+            this.CardNumberInputBox.Location = new System.Drawing.Point(64, 69);
+            this.CardNumberInputBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.CardNumberInputBox.Name = "CardNumberInputBox";
-            this.CardNumberInputBox.Size = new System.Drawing.Size(235, 27);
+            this.CardNumberInputBox.Size = new System.Drawing.Size(206, 23);
             this.CardNumberInputBox.TabIndex = 10;
             // 
             // AcceptCardNumber
             // 
-            this.AcceptCardNumber.Location = new System.Drawing.Point(218, 147);
+            this.AcceptCardNumber.Location = new System.Drawing.Point(64, 96);
+            this.AcceptCardNumber.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.AcceptCardNumber.Name = "AcceptCardNumber";
-            this.AcceptCardNumber.Size = new System.Drawing.Size(94, 29);
+            this.AcceptCardNumber.Size = new System.Drawing.Size(116, 22);
             this.AcceptCardNumber.TabIndex = 4;
-            this.AcceptCardNumber.Text = "Add Token";
+            this.AcceptCardNumber.Text = "Send Message";
             this.AcceptCardNumber.UseVisualStyleBackColor = true;
             this.AcceptCardNumber.Click += new System.EventHandler(this.AcceptCardNumber_Click);
-            // 
-            // RemoveTokenButton
-            // 
-            this.RemoveTokenButton.Location = new System.Drawing.Point(218, 12);
-            this.RemoveTokenButton.Name = "RemoveTokenButton";
-            this.RemoveTokenButton.Size = new System.Drawing.Size(235, 29);
-            this.RemoveTokenButton.TabIndex = 5;
-            this.RemoveTokenButton.Text = "Remove Selected Token";
-            this.RemoveTokenButton.UseVisualStyleBackColor = true;
-            this.RemoveTokenButton.Click += new System.EventHandler(this.RemoveTokenButton_Click);
-            // 
-            // UpdateListButton
-            // 
-            this.UpdateListButton.Location = new System.Drawing.Point(218, 47);
-            this.UpdateListButton.Name = "UpdateListButton";
-            this.UpdateListButton.Size = new System.Drawing.Size(235, 29);
-            this.UpdateListButton.TabIndex = 6;
-            this.UpdateListButton.Text = "Update List";
-            this.UpdateListButton.UseVisualStyleBackColor = true;
-            this.UpdateListButton.Click += new System.EventHandler(this.UpdateListButton_Click);
             // 
             // MqttLog
             // 
@@ -101,47 +72,58 @@ namespace device_manager
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.MqttLog.FormattingEnabled = true;
-            this.MqttLog.ItemHeight = 20;
-            this.MqttLog.Location = new System.Drawing.Point(12, 202);
+            this.MqttLog.ItemHeight = 15;
+            this.MqttLog.Location = new System.Drawing.Point(10, 152);
+            this.MqttLog.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.MqttLog.Name = "MqttLog";
-            this.MqttLog.Size = new System.Drawing.Size(455, 184);
+            this.MqttLog.Size = new System.Drawing.Size(314, 139);
             this.MqttLog.TabIndex = 7;
             // 
-            // ExportToCsvButton
+            // comboBox1
             // 
-            this.ExportToCsvButton.Location = new System.Drawing.Point(318, 147);
-            this.ExportToCsvButton.Name = "ExportToCsvButton";
-            this.ExportToCsvButton.Size = new System.Drawing.Size(135, 29);
-            this.ExportToCsvButton.TabIndex = 8;
-            this.ExportToCsvButton.Text = "Export to CSV";
-            this.ExportToCsvButton.UseVisualStyleBackColor = true;
-            this.ExportToCsvButton.Click += new System.EventHandler(this.ExportToCsvButton_Click);
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Items.AddRange(new object[] {
+            "Message",
+            "Time",
+            "Font Size"});
+            this.comboBox1.Location = new System.Drawing.Point(64, 31);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(206, 23);
+            this.comboBox1.TabIndex = 11;
+            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.ComboBox1_SelectedIndexChanged);
             // 
-            // SortButton
+            // label1
             // 
-            this.SortButton.Location = new System.Drawing.Point(218, 79);
-            this.SortButton.Name = "SortButton";
-            this.SortButton.Size = new System.Drawing.Size(94, 29);
-            this.SortButton.TabIndex = 9;
-            this.SortButton.Text = "Sort";
-            this.SortButton.UseVisualStyleBackColor = true;
-            this.SortButton.Click += new System.EventHandler(this.SortButton_Click);
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(10, 39);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(35, 15);
+            this.label1.TabIndex = 12;
+            this.label1.Text = "Topic";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(5, 72);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(53, 15);
+            this.label2.TabIndex = 13;
+            this.label2.Text = "Message";
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(482, 403);
-            this.Controls.Add(this.SortButton);
-            this.Controls.Add(this.ExportToCsvButton);
+            this.ClientSize = new System.Drawing.Size(424, 308);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.MqttLog);
-            this.Controls.Add(this.UpdateListButton);
-            this.Controls.Add(this.RemoveTokenButton);
             this.Controls.Add(this.AcceptCardNumber);
             this.Controls.Add(this.CardNumberInputBox);
             this.Controls.Add(this.LogLabel);
-            this.Controls.Add(this.TokenListBox);
-            this.MinimumSize = new System.Drawing.Size(500, 450);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.MinimumSize = new System.Drawing.Size(440, 347);
             this.Name = "Form1";
             this.Text = "Form1";
             this.ResumeLayout(false);
@@ -150,15 +132,13 @@ namespace device_manager
         }
 
         #endregion
-        private System.Windows.Forms.ListBox TokenListBox;
         private System.Windows.Forms.Label LogLabel;
         private System.Windows.Forms.TextBox CardNumberInputBox;
         private System.Windows.Forms.Button AcceptCardNumber;
-        private System.Windows.Forms.Button RemoveTokenButton;
-        private System.Windows.Forms.Button UpdateListButton;
         private System.Windows.Forms.ListBox MqttLog;
-        private System.Windows.Forms.Button ExportToCsvButton;
-        private System.Windows.Forms.Button SortButton;
+        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
     }
 }
 
